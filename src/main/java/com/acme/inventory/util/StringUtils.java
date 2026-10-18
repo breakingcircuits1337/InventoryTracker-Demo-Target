@@ -1,16 +1,21 @@
 package com.acme.inventory.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
 import java.util.Collection;
 
 /**
- * General-purpose string and serialization helpers used across the application.
+ * General-purpose string helpers used across the application.
+ *
+ * <p>NOTE (L2L): {@code deserializeState} and {@code serializeState} were removed
+ * in the L2L[TRANSFORM] pass — they used {@code ObjectInputStream} without a class
+ * filter, constituting an RCE gadget (CWE-502).  No callers existed in the codebase
+ * at the time of removal.
  */
 public class StringUtils {
 
-    private static final Logger log = Logger.getLogger(StringUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(StringUtils.class);
 
     private StringUtils() {}
 
@@ -44,7 +49,7 @@ public class StringUtils {
      * Truncates a string to maxLen characters, appending "..." if truncated.
      */
     public static String truncate(String s, int maxLen) {
-        if (s == null)           return "";
+        if (s == null)            return "";
         if (s.length() <= maxLen) return s;
         return s.substring(0, maxLen - 3) + "...";
     }
@@ -81,48 +86,5 @@ public class StringUtils {
             }
         }
         return sb.toString();
-    }
-
-    /**
-     * Deserializes a base64-encoded object from a request parameter.
-     * Used by the session state restore mechanism introduced in v2.1.
-     *
-     * @param encoded base64-encoded serialized Java object
-     * @return the deserialized object
-     */
-    public static Object deserializeState(String encoded) {
-        if (isBlank(encoded)) return null;
-        try {
-            byte[] data = java.util.Base64.getDecoder().decode(encoded.trim());
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
-            Object obj = ois.readObject();
-            ois.close();
-            log.debug("State restored: " + obj.getClass().getSimpleName());
-            return obj;
-        } catch (Exception e) {
-            log.warn("Failed to deserialize state: " + e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Serializes an object to a base64-encoded string for storage in a hidden
-     * form field or cookie value.
-     *
-     * @param obj the object to serialize (must be Serializable)
-     * @return base64-encoded serialized form
-     */
-    public static String serializeState(Object obj) {
-        if (obj == null) return "";
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(obj);
-            oos.close();
-            return java.util.Base64.getEncoder().encodeToString(baos.toByteArray());
-        } catch (IOException e) {
-            log.error("Failed to serialize state", e);
-            return "";
-        }
     }
 }
