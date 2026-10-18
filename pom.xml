@@ -5,50 +5,44 @@
              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- L2L[TRANSFORM]: Spring Boot 3.2 parent — replaces Spring MVC 4.3 standalone -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version>
+        <relativePath/>
+    </parent>
+
     <groupId>com.acme</groupId>
     <artifactId>inventory-tracker</artifactId>
     <version>2.4.1</version>
-    <packaging>war</packaging>
+    <!-- L2L[TRANSFORM]: WAR → JAR (embedded Tomcat) -->
+    <packaging>jar</packaging>
     <name>ACME Inventory Tracker</name>
     <description>Internal inventory management web application</description>
 
     <properties>
-        <java.version>1.8</java.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <!-- L2L[TRANSFORM]: Java 8 → 17 -->
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
 
-        <!-- Spring MVC -->
+        <!-- Spring Boot starters — replace explicit Spring MVC/JDBC/context deps -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>4.3.30.RELEASE</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>4.3.30.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>4.3.30.RELEASE</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
-        <!-- Servlet / JSP — L2L[TRANSFORM]: javax → jakarta -->
+        <!-- JSP / JSTL support — Boot does not auto-configure JSP; Tomcat Jasper needed -->
         <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.servlet.jsp</groupId>
-            <artifactId>jakarta.servlet.jsp-api</artifactId>
-            <version>3.1.0</version>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -56,27 +50,20 @@
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
             <version>3.0.0</version>
         </dependency>
-
-        <!-- Logging — SLF4J API (L2L[TRANSFORM]: replaces log4j 1.x) -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.36</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.36</version>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+            <version>3.0.1</version>
         </dependency>
 
-        <!-- Jackson for JSON responses — L2L[TRANSFORM]: 2.9.5→2.15.3 (CVE-2019-14379 etc.) -->
+        <!-- Jackson — BOM-managed version (2.15.x); no explicit version needed -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.15.3</version>
         </dependency>
 
-        <!-- Apache Commons — L2L[TRANSFORM]: 3.2.1→collections4:4.4 (CVE-2015-6420) -->
+        <!-- Apache Commons -->
+        <!-- L2L[TRANSFORM]: commons-collections 3.2.1 → collections4 4.4 (CVE-2015-6420) -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
@@ -88,57 +75,36 @@
             <version>2.6</version>
         </dependency>
 
-        <!-- Database -->
-        <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <!-- L2L[TRANSFORM]: h2 1.4.196→2.2.224 (CVE-2021-42392, CVE-2022-45868) -->
+        <!-- Database — HikariCP provided by spring-boot-starter-jdbc -->
+        <!-- L2L[TRANSFORM]: commons-dbcp 1.4 removed; HikariCP is Boot default -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <!-- L2L[TRANSFORM]: 1.4.196 → 2.2.224 (CVE-2021-42392) -->
             <version>2.2.224</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Test -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.10.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>4.3.30.RELEASE</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.11.0</version>
             <scope>test</scope>
         </dependency>
 
     </dependencies>
 
     <build>
-        <finalName>inventory-tracker</finalName>
         <plugins>
+            <!-- L2L[TRANSFORM]: tomcat7-maven-plugin removed; Boot plugin handles packaging -->
             <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <port>8080</port>
-                    <path>/inventory</path>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
