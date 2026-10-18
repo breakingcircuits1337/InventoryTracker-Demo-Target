@@ -1,6 +1,7 @@
 package com.acme.inventory.controller;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
@@ -17,7 +18,7 @@ import java.util.Map;
 @Controller
 public class DashboardController {
 
-    private static final Logger log = Logger.getLogger(DashboardController.class);
+    private static final Logger log = LoggerFactory.getLogger(DashboardController.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

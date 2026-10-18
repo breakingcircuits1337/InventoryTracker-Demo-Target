@@ -1,7 +1,8 @@
 package com.acme.inventory.dao;
 
 import com.acme.inventory.model.Product;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,7 +15,7 @@ import java.util.List;
 @Repository
 public class ProductDao {
 
-    private static final Logger log = Logger.getLogger(ProductDao.class);
+    private static final Logger log = LoggerFactory.getLogger(ProductDao.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

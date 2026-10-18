@@ -3,7 +3,8 @@ package com.acme.inventory.controller;
 import com.acme.inventory.model.Product;
 import com.acme.inventory.service.ProductService;
 import com.acme.inventory.util.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,7 +26,7 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
 
-    private static final Logger log = Logger.getLogger(ProductController.class);
+    private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
     @Autowired
     private ProductService productService;
