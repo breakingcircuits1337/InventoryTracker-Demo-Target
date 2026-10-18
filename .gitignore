@@ -1,0 +1,9 @@
+target/
+*.class
+*.war
+*.jar
+data/
+logs/
+.idea/
+*.iml
+.DS_Thumb
